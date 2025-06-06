@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Presentación de Ruletas</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #F7FDFF 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+        color: #004557; /* Reemplaza texto negro */
+    }
+
+    .presentacion {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .diapositiva {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: none;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .diapositiva.activa {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 0px;
+    }
+
+    /* Portada */
+    .portada {
+        background-image: url('fondo.png'); /* Reemplaza 'imagen.jpg' con la ruta a tu imagen */
+        background-size: cover; /* Ajusta la imagen para que cubra todo el fondo */
+        background-repeat: no-repeat; /* Evita que la imagen se repita */
+        text-align: center;
+        justify-content: center;
+    }
+
+    .portada h1 {
+        font-size: 3em;
+        margin-bottom: 20px;
+    }
+
+    .portada p {
+        font-size: 1.5em;
+        max-width: 800px;
+    }
+
+    /* Diapositiva de texto */
+    .texto {
+        background: #F7FDFF; /* Fondo casi blanco */
+        padding: 40px;
+        font-size: 1.2em;
+        max-width: 800px;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-top: 40px;
+        color: #004557; /* Texto oscuro */
+        border: 1px solid #6D8A92; /* Borde sutil */
+    }
+
+    .texto ul {
+        text-align: left;
+        margin: 20px auto;
+        max-width: 600px;
+    }
+
+    /* Ruletas - Contenedores */
+    .ruleta-container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .ruleta-content {
+        display: flex;
+        gap: 40px;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .controls-container {
+        flex: 1;
+        max-width: 400px;
+        margin-top: 10px;
+    }
+
+    .wheel-and-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 300px;
+        margin-top: 40px;
+    }
+
+    /* Canvas de ruletas */
+    .wheel-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 5px solid #2A6574; /* Borde azul oscuro */
+        box-shadow: 0 0 20px rgba(42, 101, 116, 0.3); /* Sombra azul */
+        transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    }
+
+    .pointer {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 30px solid #D04E95; /* Rosado para contraste */
+        z-index: 10;
+    }
+
+    /* Sección de apuestas */
+    .bet-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        background: #F7FDFF; /* Fondo casi blanco */
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #6D8A92; /* Borde sutil */
+    }
+
+    .question {
+        font-size: 1.2em;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #004557; /* Texto oscuro */
+    }
+
+    .amount-buttons, .color-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Botones */
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        font-family: 'Poppins', sans-serif;
+        color: #F7FDFF; /* Texto claro en botones */
+    }
+
+    .amount-btn {
+        background: #6D8A92; /* Color primario */
+        color: white;
+        min-width: 80px;
+        font-weight: 500;
+    }
+
+    .amount-btn:hover {
+        background: #5a7178;
+    }
+
+    .color-btn {
+        width: 100px;
+        height: 40px;
+        color: white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spin-btn {
+        background: #2A6574; /* Color secundario */
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.2em;
+        margin-top: 20px;
+        width: 100%;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .spin-btn:hover {
+        background: #1e4d5a;
+    }
+
+    /* Resultados y saldo */
+    .result {
+        font-size: 1.3em;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        border-radius: 5px;
+        background: #F7FDFF; /* Fondo casi blanco */
+        width: 100%;
+        margin-top: 15px;
+        color: #004557; /* Texto oscuro */
+        border-left: 5px solid #2A6574; /* Borde azul por defecto */
+    }
+
+    .win {
+        color: #2A6574; /* Azul oscuro para ganar */
+        border-left: 5px solid #2A6574;
+    }
+
+    .lose {
+        color: #D04E95; /* Rosado para perder */
+        border-left: 5px solid #D04E95;
+    }
+
+    .balance {
+        font-size: 1.3em;
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: #004557; /* Texto oscuro */
+        background: #F7FDFF; /* Fondo casi blanco */
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #6D8A92; /* Borde sutil */
+    }
+
+    .current-selection {
+        background: #F7FDFF; /* Fondo casi blanco */
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-weight: bold;
+        color: #004557; /* Texto oscuro */
+        border: 1px solid #6D8A92; /* Borde sutil */
+    }
+
+    .color-display {
+        font-weight: bold;
+    }
+
+    /* Navegación */
+    .controles {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 100;
+    }
+
+    .nav-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #2A6574; /* Color secundario */
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+    }
+
+    .nav-btn:hover {
+        background-color: #1e4d5a;
+    }
+
+    .nav-btn:disabled {
+        background-color: #6D8A92; /* Gris azulado */
+        cursor: not-allowed;
+    }
+    
+    /* Estilo unificado para botones deshabilitados */
+button:disabled, 
+.amount-btn:disabled, 
+.color-btn:disabled, 
+.spin-btn:disabled {
+    background-color: #6D8A92 !important; /* Mismo color que el botón "Siguiente" deshabilitado */
+    cursor: not-allowed !important;
+    opacity: 0.8 !important;
+}
+
+/* Mantén esta regla existente para el botón de navegación */
+.nav-btn:disabled {
+    background-color: #6D8A92; 
+    cursor: not-allowed;
+}
+
+/* 1. Alinear texto a la izquierda (excepto portada) */
+.diapositiva:not(.portada) .texto {
+    text-align: left; /* Alineación izquierda */
+    margin: 0 auto; /* Centra el cuadro horizontalmente */
+    width: 90%; /* Ancho consistente */
+    max-width: 800px; /* Mantener límite máximo */
+    padding: 40px; /* Aumenta este valor si necesitas más espacio interno */
+    margin: 20px auto; /* Espacio exterior superior e inferior */
+}
+
+/* 2. Ajustar posición del texto en la portada */
+.portada {
+    justify-content: center;
+    padding-top: 20vh; /* Texto 20% más abajo */
+}
+
+/* 3. Ajustar listas para alineación izquierda */
+.diapositiva:not(.portada) .texto ul {
+    text-align: left;
+    margin-left: 20px; /* Sangría estándar */
+    padding-right: 0;
+}
+    /* Responsive */
+    @media (max-width: 768px) {
+        .ruleta-content {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .controls-container, .wheel-and-controls {
+            margin-top: 10px;
+            max-width: 100%;
+        }
+        
+        .color-btn {
+            width: 80px;
+            font-size: 0.9em;
+        }
+    }
+</style>
+</head>
+<body>
+ <div class="presentacion">
+        <!-- Portada -->
+        <div class="diapositiva portada activa">
+            <p>  <br> <br> <br> <br> <br> </p>
+            <h1>El desafío de las ruletas matemáticas</h1>
+            <p>Proyecto EVEPRIM </p>
+            <p>Elaborado por: Jorge Mejías Salas</p>
+        </div>
+
+        <!-- Diapositiva de texto -->
+        <div class="diapositiva">
+            <div class="texto">
+               <h2>Historia</h2>
+                <p> <img src="assets/img/srazar.png"style="height: 500px inherit; width: 350px;float:right;">¡Bienvenidos de nuevo al mundo del azar!<br>
+            El Señor Azar ha abierto una nueva sección de su famoso <em>Casino Matemático</em>…<br>
+            y necesita tu ayuda para probar unas ruletas especiales.<br><br>
+
+            Con una sonrisa traviesa y su sombrero de copa, el Señor Azar te entrega un maletín brillante con <strong>₡1 000 de prueba</strong>.<br><br>
+
+            <em>Señor Azar dice:</em><br>
+            “¡Hola! Hoy no se trata solo de suerte, sino de estrategia. <br>
+            Con estas ruletas especiales, quiero que analicen, comparen y descubran patrones. ¿Qué tan justa es cada ruleta? ¿Dónde están las trampas del azar? 
+            Les presto estos colones para que apuesten con cabeza.”<br><br>
+
+    <strong>¡Pongan a prueba su intuición matemática!" </strong>
+            
+        </div>
+        </div>
+
+        <!-- Diapositiva explicativa de la primera ruleta -->
+        <div class="diapositiva">
+            <div class="texto">
+                <h2>¡Primera ruleta!</h2>
+                <p><img src="assets/img/ruleta1.png"style="height: 500px inherit; width: 350px;float:right;">
+                El Señor Azar señala la ruleta y dice:<br><br>
+                <em>— Empezamos con algo clásico.</em><br>
+                <em>— En esta ruleta, si ganas, ¡duplicas tu apuesta!</em><br><br>
+                Si te equivocas, simplemente se pierde lo que apostaste.  <br><br> 
+                <em>— Una buena forma de entrar en calor, ¿no te parece?</em>
+                </p>
+            </div>
+        </div>
+
+        <!-- Ruleta 1 -->
+        <div class="diapositiva">
+            <div class="ruleta-container">
+                <div class="ruleta-content">
+                    <div class="controls-container">
+                        <div class="balance">Saldo disponible: ₡<span id="balance1">1 000</span></div>
+                        
+                        <div class="bet-section">
+                            <div class="question">¿Cuánto quieres apostar?</div>
+                            <div class="amount-buttons">
+                                <button class="amount-btn" onclick="setBetAmount(10, 1)">₡10</button>
+                                <button class="amount-btn" onclick="setBetAmount(50, 1)">₡50</button>
+                                <button class="amount-btn" onclick="setBetAmount(100, 1)">₡100</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Apuesta actual: ₡<span id="current-bet1">0</span>
+                            </div>
+                            
+                            <div class="question">¿A qué color quieres apostar?</div>
+                            <div class="color-buttons">
+                                <button class="color-btn" style="background: #004557;" onclick="setBetColor('blue', 1)">Azul</button>
+                                <button class="color-btn" style="background: #9C4BD2;" onclick="setBetColor('purple', 1)">Morado</button>
+                                <button class="color-btn" style="background: #EAC148;" onclick="setBetColor('yellow', 1)">Amarillo</button>
+                                <button class="color-btn" style="background: #D04E95;" onclick="setBetColor('pink', 1)">Rosado</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Color seleccionado: <span id="selected-color1" class="color-display">Ninguno</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wheel-and-controls">
+                        <div class="wheel-container">
+                            <div class="pointer"></div>
+                            <canvas id="wheelCanvas1" width="300" height="300"></canvas>
+                        </div>
+                        <button class="spin-btn" id="spin-btn1" onclick="spinWheel(1)">Girar Ruleta</button>
+                        <div class="result" id="result1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva explicativa de la segunda ruleta -->
+        <div class="diapositiva">
+            <div class="texto">
+                <h2>¡Segunda ruleta!</h2>
+                <p><img src="assets/img/ruleta2.png"style="height: 500px inherit; width: 350px;float:right;">
+                El Señor Azar levanta su sombrero con elegancia y comenta mientras te dirige a la próxima ruleta:<br><br>
+                <em>— Ahora subimos un poco la emoción.</em>  <br>
+                Esta vez, si ganas, tu apuesta se triplica.<br>  
+                Pero claro… también podrías perder lo que pongas en juego. <br> <br>  
+                <em>— ¡Vamos a intentarlo!</em></p>
+            </div>
+        </div>
+
+        <!-- Ruleta 2 (9 espacios) -->
+        <div class="diapositiva">
+            <div class="ruleta-container">
+                <div class="ruleta-content">
+                    <div class="controls-container">
+                        <div class="balance">Saldo disponible: ₡<span id="balance2">1 000</span></div>
+                        
+                        <div class="bet-section">
+                            <div class="question">¿Cuánto quieres apostar?</div>
+                            <div class="amount-buttons">
+                                <button class="amount-btn" onclick="setBetAmount(10, 2)">₡10</button>
+                                <button class="amount-btn" onclick="setBetAmount(50, 2)">₡50</button>
+                                <button class="amount-btn" onclick="setBetAmount(100, 2)">₡100</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Apuesta actual: ₡<span id="current-bet2">0</span>
+                            </div>
+                            
+                            <div class="question">¿A qué color quieres apostar?</div>
+                            <div class="color-buttons">
+                                <button class="color-btn" style="background: #004557;" onclick="setBetColor('blue', 2)">Azul</button>
+                                <button class="color-btn" style="background: #9C4BD2;" onclick="setBetColor('purple', 2)">Morado</button>
+                                <button class="color-btn" style="background: #EAC148;" onclick="setBetColor('yellow', 2)">Amarillo</button>
+                                <button class="color-btn" style="background: #D04E95;" onclick="setBetColor('pink', 2)">Rosado</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Color seleccionado: <span id="selected-color2" class="color-display">Ninguno</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wheel-and-controls">
+                        <div class="wheel-container">
+                            <div class="pointer"></div>
+                            <canvas id="wheelCanvas2" width="300" height="300"></canvas>
+                        </div>
+                        <button class="spin-btn" id="spin-btn2" onclick="spinWheel2(2)">Girar Ruleta</button>
+                        <div class="result" id="result2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva explicativa de la tercera ruleta -->
+        <div class="diapositiva">
+            <div class="texto">
+                <h2>¡Tercera ruleta!</h2>
+                <p><img src="assets/img/ruleta3.png"style="height: 500px inherit; width: 350px;float:right;">
+                El Señor Azar abre los brazos con entusiasmo:<br><br>
+                <em>— ¡Atención! Subimos nuevamente el nivel de emoción.</em> <br>
+                Si ganas, tu recompensa será cuatro veces lo apostado.<br>  
+                Pero si no… ya sabes lo que pasa. <br> <br> 
+                <em>— ¡Vamos allá!</em> </p>
+            </div>
+        </div>
+
+        <!-- Ruleta 3 (12 espacios con configuración especial) -->
+        <div class="diapositiva">
+            <div class="ruleta-container">
+                <div class="ruleta-content">
+                    <div class="controls-container">
+                        <div class="balance">Saldo disponible: ₡<span id="balance3">1 000</span></div>
+                        
+                        <div class="bet-section">
+                            <div class="question">¿Cuánto quieres apostar?</div>
+                            <div class="amount-buttons">
+                                <button class="amount-btn" onclick="setBetAmount(10, 3)">₡10</button>
+                                <button class="amount-btn" onclick="setBetAmount(50, 3)">₡50</button>
+                                <button class="amount-btn" onclick="setBetAmount(100, 3)">₡100</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Apuesta actual: ₡<span id="current-bet3">0</span>
+                            </div>
+                            
+                            <div class="question">¿A qué color quieres apostar?</div>
+                            <div class="color-buttons">
+                                <button class="color-btn" style="background: #004557;" onclick="setBetColor('blue', 3)">Azul</button>
+                                <button class="color-btn" style="background: #9C4BD2;" onclick="setBetColor('purple', 3)">Morado</button>
+                                <button class="color-btn" style="background: #EAC148;" onclick="setBetColor('yellow', 3)">Amarillo</button>
+                                <button class="color-btn" style="background: #D04E95;" onclick="setBetColor('pink', 3)">Rosado</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Color seleccionado: <span id="selected-color3" class="color-display">Ninguno</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wheel-and-controls">
+                        <div class="wheel-container">
+                            <div class="pointer"></div>
+                            <canvas id="wheelCanvas3" width="300" height="300"></canvas>
+                        </div>
+                        <button class="spin-btn" id="spin-btn3" onclick="spinWheel3()">Girar Ruleta</button>
+                        <div class="result" id="result3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva explicativa de la cuarta ruleta -->
+        <div class="diapositiva">
+            <div class="texto">
+                <h2>¡Cuarta ruleta!</h2>
+                <p><img src="assets/img/ruleta4.png"style="height: 500px inherit; width: 350px;float:right;">
+                El Señor Azar se pone solemne y declara:<br><br>
+                <em>— Hemos llegado al gran final… Esta ruleta tiene un giro interesante.</em> <br>
+                Aquí, es todo o nada.  <br>
+                Apuestas… y puedes ganar cinco veces lo que tienes, o perderlo todo.  <br>
+                <em>— A veces la decisión más difícil… es la última.</em></p>
+            </div>
+        </div>
+
+        <!-- Ruleta 4 -->
+        <div class="diapositiva">
+            <div class="ruleta-container">
+                <div class="ruleta-content">
+                    <div class="controls-container">
+                        <div class="balance">Saldo disponible: ₡<span id="balance4">1 000</span></div>
+                        
+                        <div class="bet-section">
+                            <div class="question">Debes apostar todo tu saldo</div>
+                            <div class="amount-buttons">
+                                <button class="amount-btn" onclick="setBetAmount(saldoGlobal, 4)">Apostar Todo</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Apuesta actual: ₡<span id="current-bet4">0</span>
+                            </div>
+                            
+                            <div class="question">¿A qué color quieres apostar?</div>
+                            <div class="color-buttons">
+                                <button class="color-btn" style="background: #9C4BD2;" onclick="setBetColor('purple', 4)">Morado</button>
+                                <button class="color-btn" style="background: #EAC148;" onclick="setBetColor('yellow', 4)">Amarillo</button>
+                            </div>
+                            
+                            <div class="current-selection">
+                                Color seleccionado: <span id="selected-color4" class="color-display">Ninguno</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wheel-and-controls">
+                        <div class="wheel-container">
+                            <div class="pointer"></div>
+                            <canvas id="wheelCanvas4" width="300" height="300"></canvas>
+                        </div>
+                        <button class="spin-btn" id="spin-btn4" onclick="spinWheel4()">Girar Ruleta</button>
+                        <div class="result" id="result4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva de conclusión -->
+        <div class="diapositiva">
+        <div class="texto">
+            <h2>Reflexiones finales</h2>
+            <p>
+                <img src="assets/img/srazar.png" style="height: 500px inherit; width: 350px; float:right;">
+                <strong>El azar puede parecer divertido, pero esconde muchas lecciones.</strong><br><br>
+
+                En este recorrido aprendimos que:
+                <ul>
+                    <li><strong>La probabilidad es una herramienta poderosa.</strong></li>
+                    <li><strong>No todas las ruletas son iguales:</strong> algunas te dan más oportunidades que otras.</li>
+                    <li><strong>El azar no garantiza justicia:</strong> hay juegos diseñados para hacerte perder más de lo que ganas.</li>
+                    <li><strong>Jugar con cabeza</strong> es mejor que dejarse llevar por la emoción.</li>
+                </ul>
+
+                <em>Recuerda: entender el juego es más importante que ganarlo.</em>
+            </p>
+        </div>
+    </div>
+
+<div class="diapositiva">
+    <div class="texto">
+        <h2>¿Quieres volver a intentarlo?</h2>
+        <p>
+            Puedes reiniciar el juego y explorar de nuevo las ruletas, esta vez con más información.<br><br>
+            <strong>¿Cuál ruleta fue más justa? ¿Cuál más engañosa?</strong><br><br>
+            <em>¡Desafía al azar una vez más!</em>
+        </p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="nav-btn" onclick="location.reload()">Volver a empezar</button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Controles de navegación (solo Siguiente) -->
+    <div class="controles">
+        <button class="nav-btn" id="siguiente">Siguiente</button>
+    </div>
+
+<script>
+// Variables globales para el saldo compartido y estado de las ruletas
+    let saldoGlobal = 1000;
+    let diapositivaActual = 0;
+    
+    // Estados individuales de cada ruleta
+    const estadosRuletas = {
+        1: { currentBet: 0, selectedColor: null, isSpinning: false, currentRotation: 0, haApostado: false },
+        2: { currentBet: 0, selectedColor: null, isSpinning: false, currentRotation: 0, haApostado: false },
+        3: { currentBet: 0, selectedColor: null, isSpinning: false, currentRotation: 0, haApostado: false },
+        4: { currentBet: 0, selectedColor: null, isSpinning: false, currentRotation: 0, haApostado: false }
+    };
+
+    // Configuración de la presentación
+    const diapositivas = document.querySelectorAll('.diapositiva');
+    const btnSiguiente = document.getElementById('siguiente');
+
+    function mostrarDiapositiva(indice) {
+    if (indice < 0) indice = 0;
+    if (indice >= diapositivas.length) indice = diapositivas.length - 1;
+    
+    diapositivas.forEach(diapositiva => {
+        diapositiva.classList.remove('activa');
+    });
+    
+    diapositivas[indice].classList.add('activa');
+    
+    // Cambiar el texto del botón según la diapositiva
+    if (indice === 0) {
+        btnSiguiente.textContent = 'Empezar'; // Primera diapositiva
+    } else {
+        btnSiguiente.textContent = 'Siguiente'; // Resto de diapositivas
+    }
+
+    // Mapeo exacto de diapositivas basado en tu estructura HTML
+    const esDiapositivaRuleta = () => {
+        // Las ruletas están en las posiciones 4, 6, 8 y 10 del HTML (índices 3,5,7,9)
+        const ruletaIds = [3,5,7,9];
+        return ruletaIds.includes(indice);
+    };
+    
+    const esDiapositivaConTexto = () => {
+        // Todas las demás diapositivas excepto la última
+        return !esDiapositivaRuleta() && indice !== diapositivas.length - 1;
+    };
+    
+    if (esDiapositivaRuleta()) {
+        const ruletaIdMap = {3:1, 5:2, 7:3, 9:4}; // Mapeo de índice a ID de ruleta
+        const ruletaId = ruletaIdMap[indice];
+        const estado = estadosRuletas[ruletaId];
+        
+        // Deshabilitar siguiente si no ha apostado
+        btnSiguiente.disabled = !estado.haApostado;
+        
+        // Deshabilitar botones de apuesta si ya apostó
+        if (estado.haApostado) {
+            const diapositivaActual = diapositivas[indice];
+            const amountBtns = diapositivaActual.querySelectorAll('.amount-btn');
+            const colorBtns = diapositivaActual.querySelectorAll('.color-btn');
+            
+            amountBtns.forEach(btn => btn.disabled = true);
+            colorBtns.forEach(btn => btn.disabled = true);
+        }
+    } 
+    else if (esDiapositivaConTexto()) {
+        // Siempre habilitar siguiente en diapositivas con texto
+        btnSiguiente.disabled = false;
+    }
+    else {
+        // Última diapositiva
+        btnSiguiente.disabled = true;
+    }
+    
+    // Actualizar el saldo en todas las ruletas cuando cambiamos de diapositiva
+    if (indice >= 2) {
+        actualizarSaldos();
+    }
+    
+    if (indice === diapositivas.length - 1) {
+        btnSiguiente.style.display = 'none';
+    } else {
+        btnSiguiente.style.display = 'block'; // O 'inline-block' según tu estilo
+    }
+    
+    diapositivaActual = indice;
+}
+
+    // Event listener para el botón Siguiente
+    btnSiguiente.addEventListener('click', () => {
+        mostrarDiapositiva(diapositivaActual + 1);
+    });
+
+    // Configuración común para todas las ruletas
+    const colorSequence = [
+        'blue', 'purple', 'yellow', 'pink',
+        'blue', 'purple', 'yellow', 'pink',
+        'blue', 'purple', 'yellow', 'pink'
+    ];
+    
+    const colorNames = {
+        'blue': 'azul',
+        'purple': 'morado',
+        'yellow': 'amarillo',
+        'pink': 'rosado'
+    };
+    
+    const colorDisplayStyles = {
+        'blue': 'color: #004557;',
+        'purple': 'color: #9C4BD2;',
+        'yellow': 'color: #EAC148;',
+        'pink': 'color: #D04E95;'
+    };
+    
+    const colorValues = {
+        'blue': '#004557',
+        'purple': '#9C4BD2',
+        'yellow': '#EAC148',
+        'pink': '#D04E95'
+    };
+
+    // Configuración específica para Ruleta 2 (9 espacios)
+    const ruleta2Config = {
+        exactPositions: [
+            {angle: 20, color: 'pink'},    // 1 - Rosado
+            {angle: 60, color: 'yellow'},  // 2 - Amarillo
+            {angle: 100, color: 'purple'}, // 3 - Morado
+            {angle: 140, color: 'blue'},   // 4 - Azul
+            {angle: 180, color: 'pink'},   // 5 - Rosado
+            {angle: 220, color: 'purple'}, // 6 - Morado
+            {angle: 260, color: 'yellow'}, // 7 - Amarillo
+            {angle: 300, color: 'blue'},   // 8 - Azul
+            {angle: 340, color: 'purple'}  // 9 - Morado
+        ],
+        visualRanges: [
+            {color: 'yellow', start: 0, end: 40},
+            {color: 'pink', start: 40, end: 80},
+            {color: 'purple', start: 80, end: 120},
+            {color: 'blue', start: 120, end: 160},
+            {color: 'yellow', start: 160, end: 200},
+            {color: 'purple', start: 200, end: 240},
+            {color: 'pink', start: 240, end: 280},
+            {color: 'blue', start: 280, end: 320},
+            {color: 'purple', start: 320, end: 360}
+        ]
+    };
+
+    // Configuración específica para Ruleta 3 (12 espacios con distribución especial)
+    const ruleta3Config = {
+        exactPositions: [
+            {angle: 15, color: 'blue'},    // 1 - Azul
+            {angle: 45, color: 'pink'},    // 2 - Rosado
+            {angle: 75, color: 'pink'},    // 3 - Rosado
+            {angle: 105, color: 'yellow'},   // 4 - Amarillo
+            {angle: 135, color: 'yellow'},   // 5 - Amarillo
+            {angle: 165, color: 'yellow'},   // 6 - Amarillo
+            {angle: 195, color: 'yellow'},   // 7 - Amarillo
+            {angle: 225, color: 'purple'},   // 8 - Morado
+            {angle: 255, color: 'purple'},   // 9 - Morado
+            {angle: 285, color: 'purple'},     // 10 - Morado
+            {angle: 315, color: 'purple'},     // 11 - Morado
+            {angle: 345, color: 'purple'}      // 12 - Morado
+        ],
+        visualRanges: [
+            {color: 'purple', start: 90, end: 240},    // 150° (5/12)
+            {color: 'yellow', start: 240, end: 360},  // 120° (4/12)
+            {color: 'pink', start: 0, end: 60},    // 60° (2/12)
+            {color: 'blue', start: 60, end: 90}     // 30° (1/12)
+        ]
+    };
+
+    // Configuración específica para Ruleta 4 (amarillo en 330°-360°, cae en 285°)
+    const ruleta4Config = {
+        exactPositions: [
+            {angle: 15, color: 'yellow'},   // 1 - Amarillo (único)
+            {angle: 45, color: 'purple'},   // 2 - Morado
+            {angle: 75, color: 'purple'},   // 3 - Morado
+            {angle: 105, color: 'purple'},  // 4 - Morado
+            {angle: 135, color: 'purple'},  // 5 - Morado
+            {angle: 165, color: 'purple'},  // 6 - Morado
+            {angle: 195, color: 'purple'},  // 7 - Morado
+            {angle: 225, color: 'purple'},  // 8 - Morado
+            {angle: 255, color: 'purple'},  // 9 - Morado
+            {angle: 285, color: 'purple'},  // 10 - Morado
+            {angle: 315, color: 'purple'},  // 11 - Morado
+            {angle: 345, color: 'purple'}   // 12 - Morado
+        ],
+        visualRanges: [
+            {color: 'purple', start: 0, end: 330},   // 330° morado
+            {color: 'yellow', start: 330, end: 360}   // 30° amarillo
+        ]
+    };
+
+    // Inicializar todas las ruletas
+    const ruletas = [1, 2, 3, 4].map(id => {
+        const canvas = document.getElementById(`wheelCanvas${id}`);
+        const ctx = canvas.getContext("2d");
+        let wheelSections = [];
+        
+        // Dibujar la ruleta
+        function drawWheel() {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 140;
+        
+        wheelSections = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (id === 2) {
+            // Ruleta 2 (9 espacios) - Eliminado el texto
+            ruleta2Config.visualRanges.forEach(range => {
+                const startAngle = (range.start - 90) * Math.PI / 180;
+                const endAngle = (range.end - 90) * Math.PI / 180;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colorValues[range.color];
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+        } else if (id === 3) {
+            // Ruleta 3 (12 espacios) - Eliminado el texto
+            ruleta3Config.visualRanges.forEach(range => {
+                const startAngle = (range.start - 90) * Math.PI / 180;
+                const endAngle = (range.end - 90) * Math.PI / 180;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colorValues[range.color];
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+        } else if (id === 4) {
+            // Ruleta 4 - Eliminado el texto "A" amarillo
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, 0, 330 * Math.PI / 180);
+            ctx.closePath();
+            ctx.fillStyle = colorValues['purple'];
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, 330 * Math.PI / 180, 360 * Math.PI / 180);
+            ctx.closePath();
+            ctx.fillStyle = colorValues['yellow'];
+            ctx.fill();
+            
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
+            wheelSections = ruleta4Config.sections;
+        } else {
+            // Otras ruletas (12 espacios estándar) - Eliminado el texto
+            for (let i = 0; i < 12; i++) {
+                const color = colorSequence[i];
+                const startAngle = (i * 30) * Math.PI / 180;
+                const endAngle = ((i + 1) * 30) * Math.PI / 180;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colorValues[color];
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                wheelSections.push({
+                    index: i,
+                    color: color,
+                    startAngle: i * 30,
+                    endAngle: (i + 1) * 30,
+                    centerAngle: i * 30 + 15
+                });
+            }
+        }
+        
+        // Círculo central (se mantiene)
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
+        ctx.fillStyle = '#333';
+        ctx.fill();
+    }
+        
+        // Dibujar la ruleta al inicio
+        drawWheel();
+        
+        return {
+            id,
+            canvas: `wheelCanvas${id}`,
+            ctx,
+            wheelSections,
+            drawWheel
+        };
+    });
+
+    // Funciones comunes para todas las ruletas
+    function getNextColor(currentColor) {
+        const colors = ['blue', 'purple', 'yellow', 'pink'];
+        const currentIndex = colors.indexOf(currentColor);
+        const nextIndex = (currentIndex + 1) % colors.length;
+        return colors[nextIndex];
+    }
+
+    function normalizeAngle(angle) {
+        return ((angle % 360) + 360) % 360;
+    }
+
+    function findWinningSection(angle, wheelSections) {
+        angle = normalizeAngle(angle);
+        for (const section of wheelSections) {
+            const start = section.startAngle;
+            const end = section.endAngle;
+            if (angle >= start && angle < end) {
+                const nextColor = getNextColor(section.color);
+                return {
+                    ...section,
+                    color: nextColor,
+                    originalColor: section.color
+                };
+            }
+        }
+        return null;
+    }
+
+    // Actualizar saldo en todas las ruletas
+    function actualizarSaldos() {
+        document.getElementById('balance1').textContent = saldoGlobal;
+        document.getElementById('balance2').textContent = saldoGlobal;
+        document.getElementById('balance3').textContent = saldoGlobal;
+        document.getElementById('balance4').textContent = saldoGlobal;
+    }
+
+    // Funciones de control para las ruletas
+    function setBetAmount(amount, ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        if (estado.isSpinning || estado.haApostado) return;
+        
+        // Lógica especial para la cuarta ruleta (ID 4)
+        if (ruletaId === 4) {
+            estado.currentBet = saldoGlobal;
+            document.getElementById(`current-bet${ruletaId}`).textContent = estado.currentBet;
+        } else {
+            if (saldoGlobal >= amount) {
+                estado.currentBet = amount;
+                document.getElementById(`current-bet${ruletaId}`).textContent = amount;
+            } else {
+                alert('No tienes suficiente saldo para esta apuesta.');
+            }
+        }
+    }
+
+    function setBetColor(color, ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        if (estado.isSpinning || estado.haApostado) return;
+        
+        estado.selectedColor = color;
+        const colorDisplay = document.getElementById(`selected-color${ruletaId}`);
+        colorDisplay.textContent = colorNames[color];
+        colorDisplay.style = colorDisplayStyles[color];
+    }
+
+    function spinWheel(ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        const ruleta = ruletas.find(r => r.id === ruletaId);
+        
+        if (!estado || !ruleta || estado.isSpinning || estado.haApostado) return;
+        if (estado.currentBet <= 0) {
+            alert('Por favor selecciona una cantidad para apostar.');
+            return;
+        }
+        if (!estado.selectedColor) {
+            alert('Por favor selecciona un color para apostar.');
+            return;
+        }
+        if (estado.currentBet > saldoGlobal) {
+            alert('No tienes suficiente saldo para esta apuesta.');
+            return;
+        }
+        
+        estado.isSpinning = true;
+        estado.haApostado = true;
+        saldoGlobal -= estado.currentBet;
+        actualizarSaldos();
+        
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        resultDiv.textContent = '';
+        resultDiv.className = 'result';
+        
+        // Deshabilitar botones de apuesta
+        const diapositiva = document.getElementById(ruleta.canvas).closest('.diapositiva');
+        const amountBtns = diapositiva.querySelectorAll('.amount-btn');
+        const colorBtns = diapositiva.querySelectorAll('.color-btn');
+        
+        amountBtns.forEach(btn => btn.disabled = true);
+        colorBtns.forEach(btn => btn.disabled = true);
+        
+        // Habilitar botón siguiente
+        btnSiguiente.disabled = false;
+        
+        // Seleccionar color ganador primero
+        const winningColor = colorSequence[Math.floor(Math.random() * 12)];
+        
+        // Encontrar todas las posiciones de este color
+        const winningPositions = ruleta.wheelSections.filter(s => s.color === winningColor);
+        
+        // Seleccionar una posición específica de este color al azar
+        const targetSection = winningPositions[Math.floor(Math.random() * winningPositions.length)];
+        
+        // 5-10 vueltas completas (1800-3600 grados)
+        const fullTurns = 5 + Math.floor(Math.random() * 6);
+        const spinDegrees = fullTurns * 360;
+        
+        // Calcular rotación final para centrar en la sección ganadora
+        const finalRotation = spinDegrees + (360 - targetSection.centerAngle);
+        estado.currentRotation = finalRotation;
+        
+        // Aplicar la rotación
+        const canvas = document.getElementById(ruleta.canvas);
+        canvas.style.transform = `rotate(${-estado.currentRotation}deg)`;
+        
+        setTimeout(() => {
+            estado.isSpinning = false;
+            
+            // Calcular posición exacta del puntero (0° = arriba)
+            const pointerAngle = normalizeAngle(estado.currentRotation % 360);
+            
+            // Encontrar la sección ganadora
+            const winningSection = findWinningSection(pointerAngle, ruleta.wheelSections);
+            
+            if (winningSection) {
+                checkWin(winningSection.color, ruletaId);
+            } else {
+                console.error("No se pudo determinar la sección ganadora.");
+            }
+        }, 4000);
+    }
+
+    function spinWheel2(ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        const canvas = document.getElementById(`wheelCanvas${ruletaId}`);
+        
+        if (!estado || estado.isSpinning || estado.haApostado) return;
+        if (estado.currentBet <= 0) {
+            alert('Por favor selecciona una cantidad para apostar.');
+            return;
+        }
+        if (!estado.selectedColor) {
+            alert('Por favor selecciona un color para apostar.');
+            return;
+        }
+        if (estado.currentBet > saldoGlobal) {
+            alert('No tienes suficiente saldo para esta apuesta.');
+            return;
+        }
+        
+        estado.isSpinning = true;
+        estado.haApostado = true;
+        saldoGlobal -= estado.currentBet;
+        actualizarSaldos();
+        
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        resultDiv.textContent = '';
+        resultDiv.className = 'result';
+        
+        // Deshabilitar botones de apuesta
+        const diapositiva = canvas.closest('.diapositiva');
+        const amountBtns = diapositiva.querySelectorAll('.amount-btn');
+        const colorBtns = diapositiva.querySelectorAll('.color-btn');
+        
+        amountBtns.forEach(btn => btn.disabled = true);
+        colorBtns.forEach(btn => btn.disabled = true);
+        
+        // Habilitar botón siguiente
+        btnSiguiente.disabled = false;
+        
+        // Seleccionar una posición aleatoria de las exactas (0-8)
+        const randomIndex = Math.floor(Math.random() * ruleta2Config.exactPositions.length);
+        const targetPosition = ruleta2Config.exactPositions[randomIndex];
+        const winningColor = targetPosition.color;
+        
+        // 5-10 vueltas completas (1800-3600 grados)
+        const fullTurns = 5 + Math.floor(Math.random() * 6);
+        const spinDegrees = fullTurns * 360;
+        
+        // Calcular rotación final para que el puntero apunte exactamente a la posición ganadora
+        // Compensamos +90° porque el 0° visual está arriba
+        const finalRotation = spinDegrees + (360 - targetPosition.angle + 90);
+        estado.currentRotation = finalRotation;
+        
+        // Aplicar la rotación (negativa porque CSS rota en sentido horario)
+        canvas.style.transform = `rotate(${-finalRotation}deg)`;
+        
+        setTimeout(() => {
+            estado.isSpinning = false;
+            
+            // Verificar el resultado
+            checkWinRuleta2(winningColor, ruletaId);
+        }, 4000);
+    }
+
+    function spinWheel3() {
+        const ruletaId = 3;
+        const estado = estadosRuletas[ruletaId];
+        const canvas = document.getElementById(`wheelCanvas${ruletaId}`);
+        
+        if (!estado || estado.isSpinning || estado.haApostado) return;
+        if (estado.currentBet <= 0) {
+            alert('Por favor selecciona una cantidad para apostar.');
+            return;
+        }
+        if (!estado.selectedColor) {
+            alert('Por favor selecciona un color para apostar.');
+            return;
+        }
+        if (estado.currentBet > saldoGlobal) {
+            alert('No tienes suficiente saldo para esta apuesta.');
+            return;
+        }
+        
+        estado.isSpinning = true;
+        estado.haApostado = true;
+        saldoGlobal -= estado.currentBet;
+        actualizarSaldos();
+        
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        resultDiv.textContent = '';
+        resultDiv.className = 'result';
+        
+        // Deshabilitar botones de apuesta
+        const diapositiva = canvas.closest('.diapositiva');
+        const amountBtns = diapositiva.querySelectorAll('.amount-btn');
+        const colorBtns = diapositiva.querySelectorAll('.color-btn');
+        
+        amountBtns.forEach(btn => btn.disabled = true);
+        colorBtns.forEach(btn => btn.disabled = true);
+        
+        // Habilitar botón siguiente
+        btnSiguiente.disabled = false;
+        
+        // Seleccionar una posición aleatoria de las exactas (0-11)
+        const randomIndex = Math.floor(Math.random() * ruleta3Config.exactPositions.length);
+        const targetPosition = ruleta3Config.exactPositions[randomIndex];
+        const winningColor = targetPosition.color;
+        
+        // 5-10 vueltas completas (1800-3600 grados)
+        const fullTurns = 5 + Math.floor(Math.random() * 6);
+        const spinDegrees = fullTurns * 360;
+        
+        // Calcular rotación final para que el puntero apunte exactamente a la posición ganadora
+        const finalRotation = spinDegrees + (360 - targetPosition.angle + 90);
+        estado.currentRotation = finalRotation;
+        
+        // Aplicar la rotación
+        canvas.style.transform = `rotate(${-finalRotation}deg)`;
+        
+        setTimeout(() => {
+            estado.isSpinning = false;
+            
+            // Verificar el resultado con multiplicador x4
+            checkWinRuleta3(winningColor, ruletaId);
+        }, 4000);
+    }
+
+    function spinWheel4() {
+        const ruletaId = 4;
+        const estado = estadosRuletas[ruletaId];
+        const canvas = document.getElementById(`wheelCanvas${ruletaId}`);
+        
+        if (!estado || estado.isSpinning || estado.haApostado) return;
+        if (estado.currentBet <= 0) {
+            alert('Debes apostar todo tu saldo');
+            return;
+        }
+        if (!estado.selectedColor) {
+            alert('Selecciona un color');
+            return;
+        }
+        
+        estado.isSpinning = true;
+        estado.haApostado = true;
+        saldoGlobal -= estado.currentBet;
+        actualizarSaldos();
+        
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        resultDiv.textContent = '';
+        resultDiv.className = 'result';
+        
+        // Deshabilitar botones de apuesta
+        const diapositiva = canvas.closest('.diapositiva');
+        const amountBtns = diapositiva.querySelectorAll('.amount-btn');
+        const colorBtns = diapositiva.querySelectorAll('.color-btn');
+        
+        amountBtns.forEach(btn => btn.disabled = true);
+        colorBtns.forEach(btn => btn.disabled = true);
+        
+        // Habilitar botón siguiente
+        btnSiguiente.disabled = false;
+        
+        // Definir el ángulo objetivo según la apuesta
+        let targetAngle;
+        
+        if (estado.selectedColor === 'yellow') {
+            // Si apuesta amarillo, seleccionar un morado al azar (0-10, excluyendo el 285° amarillo)
+            const purplePositions = ruleta4Config.exactPositions.filter(pos => pos.color === 'purple');
+            const randomIndex = Math.floor(Math.random() * purplePositions.length);
+            targetAngle = purplePositions[randomIndex].angle;
+        } else {
+            // Si apuesta morado, seleccionar el único amarillo (285°)
+            targetAngle = ruleta4Config.exactPositions.find(pos => pos.color === 'yellow').angle;
+        }
+        
+        // Giro completo + ajuste para caer en el ángulo deseado
+        const fullTurns = 5 + Math.floor(Math.random() * 6);
+        const spinDegrees = fullTurns * 360;
+        const finalRotation = spinDegrees + (360 - targetAngle + 90); // +90° compensación visual
+        estado.currentRotation = finalRotation;
+        
+        canvas.style.transform = `rotate(${-finalRotation}deg)`;
+        
+        setTimeout(() => {
+            estado.isSpinning = false;
+            
+            // Determinar el color ganador (opuesto a lo que apostó)
+            const winningColor = estado.selectedColor === 'yellow' ? 'purple' : 'yellow';
+            checkWinRuleta4(winningColor, ruletaId);
+        }, 4000);
+    }
+
+    function checkWin(winningColor, ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        
+        let multiplier = 2; // Por defecto duplica (primera ruleta)
+        
+        // Ajustar multiplicador según la ruleta
+        if (ruletaId === 3) multiplier = 4; // Tercera ruleta cuadruplica
+        if (ruletaId === 4) multiplier = 5; // Cuarta ruleta quintuplica
+        
+        if (winningColor === estado.selectedColor) {
+            const winAmount = estado.currentBet * multiplier;
+            saldoGlobal += winAmount;
+            resultDiv.innerHTML = `<span style="${colorDisplayStyles[winningColor]}">¡Felicidades! Ganaste ₡${winAmount}</span>`;
+            resultDiv.className = 'result win';
+        } else {
+            resultDiv.innerHTML = ` <span style="${colorDisplayStyles[winningColor]}">Oh, lo lamento. No has ganado esta vez. El color ganador era ${colorNames[winningColor]}</span>.`;
+            resultDiv.className = 'result lose';
+        }
+        
+        // Reset para la siguiente apuesta
+        estado.currentBet = 0;
+        estado.selectedColor = null;
+        document.getElementById(`current-bet${ruletaId}`).textContent = '0';
+        document.getElementById(`selected-color${ruletaId}`).textContent = 'Ninguno';
+        document.getElementById(`selected-color${ruletaId}`).style = '';
+        
+        // Actualizar saldos
+        actualizarSaldos();
+    }
+
+    function checkWinRuleta2(winningColor, ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        
+        if (winningColor === estado.selectedColor) {
+            const winAmount = estado.currentBet * 3; // Premio x3 para ruleta 2
+            saldoGlobal += winAmount;
+            resultDiv.innerHTML = `<span style="${colorDisplayStyles[winningColor]}">¡Felicidades! Ganaste ₡${winAmount}</span>.`;
+            resultDiv.className = 'result win';
+        } else {
+            resultDiv.innerHTML = ` <span style="${colorDisplayStyles[winningColor]}">Oh, lo lamento. No has ganado esta vez. El color ganador era ${colorNames[winningColor]}</span>.`;
+            resultDiv.className = 'result lose';
+        }
+        
+        // Reset para la siguiente apuesta
+        estado.currentBet = 0;
+        estado.selectedColor = null;
+        document.getElementById(`current-bet${ruletaId}`).textContent = '0';
+        document.getElementById(`selected-color${ruletaId}`).textContent = 'Ninguno';
+        document.getElementById(`selected-color${ruletaId}`).style = '';
+        
+        actualizarSaldos();
+    }
+
+    function checkWinRuleta3(winningColor, ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        
+        if (winningColor === estado.selectedColor) {
+            const winAmount = estado.currentBet * 4; // Premio x4 para ruleta 3
+            saldoGlobal += winAmount;
+            resultDiv.innerHTML = `<span style="${colorDisplayStyles[winningColor]}">¡Felicidades! Ganaste ₡${winAmount}</span>.`;
+            resultDiv.className = 'result win';
+        } else {
+            resultDiv.innerHTML = `<span style="${colorDisplayStyles[winningColor]}">Oh, lo lamento. No has ganado esta vez. El color ganador era ${colorNames[winningColor]}</span>.`;
+        }
+        
+        // Reset para la siguiente apuesta
+        estado.currentBet = 0;
+        estado.selectedColor = null;
+        document.getElementById(`current-bet${ruletaId}`).textContent = '0';
+        document.getElementById(`selected-color${ruletaId}`).textContent = 'Ninguno';
+        document.getElementById(`selected-color${ruletaId}`).style = '';
+        
+        actualizarSaldos();
+    }
+
+    function checkWinRuleta4(winningColor, ruletaId) {
+        const estado = estadosRuletas[ruletaId];
+        const resultDiv = document.getElementById(`result${ruletaId}`);
+        
+        // El jugador siempre pierde, pero el mensaje varía
+        if (winningColor === estado.selectedColor) {
+            const winAmount = estado.currentBet * 5;
+            saldoGlobal += winAmount;
+            resultDiv.textContent = `<span style="${colorDisplayStyles[winningColor]}">¡Felicidades! Ganaste ₡${winAmount}</span>`;
+            resultDiv.className = 'result win';
+        } else {
+            resultDiv.innerHTML = `<span style="${colorDisplayStyles[winningColor]}">No has ganado. El color ganador era ${colorNames[winningColor]}</span>.`;
+            resultDiv.className = 'result lose';
+        }
+        
+        // Reset para la siguiente apuesta
+        estado.currentBet = 0;
+        estado.selectedColor = null;
+        document.getElementById(`current-bet${ruletaId}`).textContent = '0';
+        document.getElementById(`selected-color${ruletaId}`).textContent = 'Ninguno';
+        document.getElementById(`selected-color${ruletaId}`).style = '';
+        
+        actualizarSaldos();
+    }
+
+    // Inicialización
+    window.onload = function() {
+        // Mostrar la primera diapositiva
+        mostrarDiapositiva(0);
+        
+        // Inicializar saldos
+        actualizarSaldos();
+        
+        // Dibujar todas las ruletas
+        ruletas.forEach(ruleta => ruleta.drawWheel());
+    };
+</script>
+</body>
+</html>
