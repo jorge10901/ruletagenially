@@ -406,7 +406,6 @@ button:disabled,
             <div class="ruleta-container">
                 <div class="ruleta-content">
                     <div class="controls-container">
-                        <h2>Ruleta 1</h2>
                         <div class="balance">Saldo disponible: ₡<span id="balance1">1 000</span></div>
                         
                         <div class="bet-section">
@@ -465,7 +464,6 @@ button:disabled,
             <div class="ruleta-container">
                 <div class="ruleta-content">
                     <div class="controls-container">
-                        <h2>Ruleta 2</h2>
                         <div class="balance">Saldo disponible: ₡<span id="balance2">1 000</span></div>
                         
                         <div class="bet-section">
@@ -524,9 +522,7 @@ button:disabled,
             <div class="ruleta-container">
                 <div class="ruleta-content">
                     <div class="controls-container">
-                        <h2>Ruleta 3</h2>
                         <div class="balance">Saldo disponible: ₡<span id="balance3">1 000</span></div>
-                        
                         <div class="bet-section">
                             <div class="question">¿Cuánto quieres apostar?</div>
                             <div class="amount-buttons">
@@ -583,7 +579,6 @@ button:disabled,
             <div class="ruleta-container">
                 <div class="ruleta-content">
                     <div class="controls-container">
-                        <h2>Ruleta 4</h2>
                         <div class="balance">Saldo disponible: ₡<span id="balance4">1 000</span></div>
                         
                         <div class="bet-section">
@@ -1370,7 +1365,7 @@ button:disabled,
             resultDiv.textContent = `¡Felicidades! Ganaste ₡${winAmount}`;
             resultDiv.className = 'result win';
         } else {
-            resultDiv.innerHTML = `Oh, lo lamento. No has ganado esta vez. El color ganador era ${colorNames[winningColor]}.`;
+            resultDiv.innerHTML = `Oh, lo lamento. No has ganado esta vez. El color ganador era <span style="${colorDisplayStyles[winningColor]}">${colorNames[winningColor]}</span>.`;
             resultDiv.className = 'result lose';
         }
         
